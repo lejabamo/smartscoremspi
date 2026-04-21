@@ -54,29 +54,34 @@ function getDetailedGapAnalysis(q) {
     'Governance': {
        problem: 'Ausencia de Marco de Gobernanza MSPI',
        impact: 'Falta de dirección estratégica y responsabilidad legal. Sin políticas aprobadas, cualquier control técnico carece de validez jurídica ante MinTIC.',
-       action: 'Aprobar formalmente la Política General de Seguridad de la Información mediante Acto Administrativo y conformar el Comité de Seguridad.'
+       action: 'Aprobar formalmente la Política General de Seguridad de la Información mediante Acto Administrativo y conformar el Comité de Seguridad.',
+       responsible: 'Alta Gerencia / Secretaría General'
     },
     'Risk Management': {
        problem: 'Falta de Gestión de Riesgos Institucional',
        impact: 'La entidad está "ciega" ante sus amenazas. No se pueden priorizar inversiones ni proteger activos críticos de forma costo-efectiva.',
-       action: 'Realizar una metodología de gestión de riesgos (basada en MAGERIT o ISO 31000) e identificar los activos de información del proceso misional.'
+       action: 'Realizar una metodología de gestión de riesgos (basada en MAGERIT o ISO 31000) e identificar los activos de información del proceso misional.',
+       responsible: 'Oficina de Planeación / CISO'
     },
     'Operational Controls': {
        problem: 'Debilidad en la Operación y Controles Técnicos',
        impact: 'Vulnerabilidad directa ante ataques externos, robo de identidad o pérdida accidental de datos ciudadanos por falta de procedimientos.',
-       action: 'Implementar controles de acceso, gestión de copias de seguridad y procedimientos de respuesta ante incidentes cibernéticos.'
+       action: 'Implementar controles de acceso, gestión de copias de seguridad y procedimientos de respuesta ante incidentes cibernéticos.',
+       responsible: 'Oficina de TI / Sistemas'
     },
     'Compliance & Evidence': {
        problem: 'Incumplimiento de Evidencia y Monitoreo',
        impact: 'Imposibilidad de demostrar cumplimiento ante la Procuraduría o MinTIC. Lo que no está documentado y registrado no existe para el auditor.',
-       action: 'Establecer un programa de cumplimiento periódico y generar registros (actas, logs, auditorías internas) como evidencia de efectividad.'
+       action: 'Establecer un programa de cumplimiento periódico y generar registros (actas, logs, auditorías internas) como evidencia de efectividad.',
+       responsible: 'Control Interno / Jurídica'
     }
   };
 
   const analysis = analysisMap[domain] || {
     problem: `Deficiencia en ${getDomainLabel(domain)}`,
     impact: 'Riesgo de incumplimiento normativo y debilitamiento del ecosistema de confianza digital de la entidad.',
-    action: 'Documentar el procedimiento, asignar responsables y generar evidencia de su ejecución.'
+    action: 'Documentar el procedimiento, asignar responsables y generar evidencia de su ejecución.',
+    responsible: 'Responsable del Proceso'
   };
 
   const priority = q.weight >= 1.0 ? 'Alta' : q.weight >= 0.8 ? 'Media' : 'Baja';
@@ -115,15 +120,16 @@ export function buildReportHTML(user, scoringResult) {
 
   // Action plan rows
   const actionRows = top5Gaps.map((q, i) => {
-    const { priority, priorityColor, problem, action } = getDetailedGapAnalysis(q);
+    const { priority, priorityColor, problem, action, responsible } = getDetailedGapAnalysis(q);
     return `
       <tr style="background:${i % 2 === 0 ? '#F8FAFC' : '#FFFFFF'}">
         <td style="padding:10px 12px;font-size:12px;color:#475569;vertical-align:top;">${problem}</td>
+        <td style="padding:10px 12px;font-size:11px;color:#334155;vertical-align:top;font-weight:600;">${responsible}</td>
         <td style="padding:10px 12px;font-size:12px;color:#1E293B;vertical-align:top;">${action}</td>
         <td style="padding:10px 12px;text-align:center;vertical-align:top;">
           <span style="background:${priorityColor}22;color:${priorityColor};padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;">${priority}</span>
         </td>
-        <td style="padding:10px 12px;font-size:11px;color:#64748B;vertical-align:top;">${priority === 'Alta' ? '0–3 meses' : priority === 'Media' ? '3–6 meses' : '6–12 meses'}</td>
+        <td style="padding:10px 12px;font-size:11px;color:#64748B;vertical-align:top;white-space:nowrap;">${priority === 'Alta' ? '1–3 Meses' : priority === 'Media' ? '3–6 Meses' : '6–12 Meses'}</td>
       </tr>`;
   }).join('');
 
@@ -486,18 +492,19 @@ export function buildReportHTML(user, scoringResult) {
   <!-- 5. Plan de Acción Priorizado -->
   <div class="section-header" style="margin-top:0;">
     <div class="section-num">5</div>
-    <div class="section-title">Plan de Acción Priorizado</div>
+    <div class="section-title">Plan de Acción Sugerido</div>
   </div>
   <table class="styled-table">
     <thead>
       <tr>
-        <th style="width:20%;">Dominio</th>
-        <th style="width:40%;">Acción Recomendada</th>
-        <th style="width:15%;text-align:center;">Prioridad</th>
-        <th style="width:25%;">Horizonte</th>
+        <th style="width:20%;">Problema</th>
+        <th style="width:20%;">Responsable</th>
+        <th style="width:35%;">Acción Recomendada</th>
+        <th style="width:12%;text-align:center;">Prioridad</th>
+        <th style="width:13%;">Tiempo Est.</th>
       </tr>
     </thead>
-    <tbody>${actionRows || '<tr><td colspan="4" style="padding:16px;text-align:center;color:#10B981;">Sin acciones pendientes</td></tr>'}</tbody>
+    <tbody>${actionRows || '<tr><td colspan="5" style="padding:16px;text-align:center;color:#10B981;">Sin acciones pendientes</td></tr>'}</tbody>
   </table>
 </div>
 
