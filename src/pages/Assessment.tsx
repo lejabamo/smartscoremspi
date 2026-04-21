@@ -62,7 +62,7 @@ function Assessment() {
   const validateForm = (): boolean => {
     const newErrors: Record<number, boolean> = {};
     let isValid = true;
-    MSPI_QUESTIONS.forEach(question => {
+    MSPI_QUESTIONS.forEach((question: any) => {
       if (answers[question.id] === undefined) {
         newErrors[question.id] = true;
         isValid = false;
@@ -251,7 +251,7 @@ function Assessment() {
               </div>
 
               <div className="space-y-1">
-                {questions.map((question) => {
+                {questions.map((question: any) => {
                   const hasError = errors[question.id];
                   const selectedValue = answers[question.id];
 

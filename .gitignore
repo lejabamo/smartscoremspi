@@ -12,7 +12,9 @@ dist/
 # Database (runtime data, not code)
 *.sqlite
 *.sqlite-journal
-data/
+# Database folder (if any)
+/data/
+/server/db/
 
 # OS files
 .DS_Store
