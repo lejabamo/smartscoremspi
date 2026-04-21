@@ -5,9 +5,10 @@ import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import db from './config/db.js';
 import nodemailer from 'nodemailer';
-import PDFDocument from 'pdfkit';
+import puppeteer from 'puppeteer';
 import * as dotenv from 'dotenv';
 import { MSPI_QUESTIONS } from './data/questions.js';
+import { buildReportHTML } from './reportTemplate.js';
 
 dotenv.config();
 
@@ -32,53 +33,32 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// --- PDF Generation ---
+// --- PDF Generation (Puppeteer) ---
 async function generatePDF(user, scoringResult) {
-  return new Promise((resolve) => {
-    const doc = new PDFDocument({ margin: 50 });
-    const chunks = [];
+  const html = buildReportHTML(user, scoringResult);
 
-    doc.on('data', (chunk) => chunks.push(chunk));
-    doc.on('end', () => resolve(Buffer.concat(chunks)));
-
-    // Header
-    doc.fontSize(20).text('SmartScore MSPI - Informe de Evaluación', { align: 'center' });
-    doc.moveDown();
-    doc.fontSize(12).text(`Fecha: ${new Date().toLocaleDateString()}`);
-    doc.text(`Usuario: ${user.name}`);
-    doc.text(`Email: ${user.email}`);
-    doc.text(`Teléfono: ${user.phone}`);
-    doc.moveDown();
-
-    // Summary
-    doc.rect(50, doc.y, 500, 80).fillAndStroke('#f8fafc', '#e2e8f0');
-    doc.fillColor('#000').fontSize(16).text('Resumen del Diagnóstico', 60, doc.y + 10);
-    doc.fontSize(24).fillColor('#2563eb').text(`${scoringResult.totalScore} / 100`, { align: 'center' });
-    doc.fontSize(12).fillColor('#64748b').text(`Nivel de Madurez: ${scoringResult.maturityLevel}`, { align: 'center' });
-    doc.moveDown(2);
-
-    // Gaps (Failures)
-    doc.fillColor('#000').fontSize(16).text('Oportunidades de Mejora (Fallas detectadas)', { underline: true });
-    doc.moveDown();
-
-    if (scoringResult.gaps.length === 0) {
-      doc.fontSize(12).text('No se detectaron fallas críticas. ¡Excelente cumplimiento!');
-    } else {
-      scoringResult.gaps.forEach((gapId, index) => {
-        const question = MSPI_QUESTIONS.find(q => q.id === gapId);
-        if (question) {
-          doc.fontSize(11).fillColor('#1e293b').text(`${index + 1}. ${question.text}`, { bold: true });
-          doc.fontSize(9).fillColor('#64748b').text(`Ref MSPI: ${question.refMSPI} | Ref ISO: ${question.refISO}`);
-          doc.moveDown();
-        }
-      });
-    }
-
-    doc.moveDown();
-    doc.fontSize(10).fillColor('#94a3b8').text('Este informe es generado automáticamente por la plataforma SmartScore MSPI.', { align: 'center' });
-
-    doc.end();
+  const browser = await puppeteer.launch({
+    headless: 'new',
+    args: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-gpu',
+    ],
   });
+
+  try {
+    const page = await browser.newPage();
+    await page.setContent(html, { waitUntil: 'networkidle0', timeout: 30000 });
+    const pdfBuffer = await page.pdf({
+      format: 'A4',
+      printBackground: true,
+      margin: { top: '0', right: '0', bottom: '0', left: '0' },
+    });
+    return pdfBuffer;
+  } finally {
+    await browser.close();
+  }
 }
 
 // --- API Endpoints ---
