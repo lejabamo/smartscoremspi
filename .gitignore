@@ -1,0 +1,31 @@
+# Dependencies
+node_modules/
+
+# Environment variables (NEVER commit this)
+.env
+.env.local
+.env.production
+
+# Build output
+dist/
+
+# Database (runtime data, not code)
+*.sqlite
+*.sqlite-journal
+data/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+npm-debug.log*
+
+# Editor
+.vscode/
+*.suo
+*.user
+
+# TypeScript cache
+*.tsbuildinfo

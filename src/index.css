@@ -1,0 +1,82 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-navy-50: #f8fafc;
+  --color-navy-100: #f1f5f9;
+  --color-navy-200: #e2e8f0;
+  --color-navy-300: #cbd5e1;
+  --color-navy-400: #94a3b8;
+  --color-navy-500: #64748b;
+  --color-navy-600: #475569;
+  --color-navy-700: #334155;
+  --color-navy-800: #1e293b;
+  --color-navy-900: #0f172a;
+  --color-navy-950: #020617;
+  
+  --color-status-success: #10b981;
+  --color-status-success-bg: #ecfdf5;
+  --color-status-warning: #f59e0b;
+  --color-status-warning-bg: #fffbeb;
+  --color-status-danger: #ef4444;
+  --color-status-danger-bg: #fef2f2;
+  
+  --shadow-premium: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.08);
+}
+
+body {
+  @apply font-sans bg-slate-50 text-slate-900 antialiased;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  margin: 0;
+}
+
+.app-header {
+  @apply py-6 bg-slate-950 text-white shadow-xl relative overflow-hidden;
+  background: linear-gradient(135deg, #020617 0%, #0f172a 100%);
+}
+
+.card {
+  @apply bg-white rounded-2xl border border-slate-100 shadow-sm transition-all duration-300;
+}
+
+.card:hover {
+  @apply shadow-premium;
+}
+
+.btn-primary {
+  @apply px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl shadow-lg shadow-blue-500/30 transition-all duration-200 active:scale-95 disabled:opacity-50 disabled:active:scale-100;
+}
+
+.glass-card {
+  @apply bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-3xl p-8;
+}
+
+.landing-hero {
+  @apply relative min-h-[90vh] flex items-center justify-center py-20 px-4 overflow-hidden;
+}
+
+.radio-card {
+  @apply relative flex items-center gap-3 p-4 border-2 border-slate-100 rounded-xl cursor-pointer transition-all hover:border-blue-200;
+}
+
+.radio-card.selected {
+  @apply border-blue-600 bg-blue-50/50;
+}
+
+.progress-track {
+  @apply h-1.5 w-full bg-slate-200 rounded-full overflow-hidden;
+}
+
+.progress-fill {
+  @apply h-full bg-blue-600 transition-all duration-500 ease-out;
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
