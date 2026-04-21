@@ -1,4 +1,16 @@
 import { MSPI_QUESTIONS } from './data/questions.js';
+import { readFileSync } from 'fs';
+import { join, dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+
+function getLogoBase64(file) {
+  try {
+    const buf = readFileSync(join(__dirname, '..', 'img', file));
+    return `data:image/jpeg;base64,${buf.toString('base64')}`;
+  } catch { return ''; }
+}
 
 // --- Helpers ---
 function getMaturityColor(level) {
@@ -95,6 +107,8 @@ export function buildReportHTML(user, scoringResult) {
   const { totalScore, maturityLevel, domainScores, gaps } = scoringResult;
   const matColor = getMaturityColor(maturityLevel);
   const today = new Date().toLocaleDateString('es-CO', { year: 'numeric', month: 'long', day: 'numeric' });
+  const logoFull = getLogoBase64('logoynombreempresa.jpeg');
+  const logoIsotipo = getLogoBase64('isotipo.jpeg');
 
   // Top 5 critical gaps
   const top5Gaps = gaps.slice(0, 5).map(gapId => {
@@ -185,19 +199,28 @@ export function buildReportHTML(user, scoringResult) {
       background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, transparent 70%);
       border-radius: 50%;
     }
+    /* COVER LOGO AREA */
     .cover-logo {
       display: flex;
       align-items: center;
-      gap: 14px;
+      gap: 0;
     }
-    .cover-logo-icon {
-      width: 48px; height: 48px;
-      background: #3B82F6;
-      border-radius: 12px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 24px;
+    .cover-logo img {
+      height: 52px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      object-fit: contain;
     }
-    .cover-logo-text { color: #93C5FD; font-weight: 700; font-size: 18px; letter-spacing: 0.5px; }
+    .cover-logo-product {
+      margin-left: 20px;
+      padding-left: 20px;
+      border-left: 1px solid rgba(255,255,255,0.2);
+      color: #93C5FD;
+      font-weight: 500;
+      font-size: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
     .cover-main { position: relative; z-index: 1; }
     .cover-badge {
       display: inline-block;
@@ -273,11 +296,29 @@ export function buildReportHTML(user, scoringResult) {
       margin-top: 4px;
     }
 
-    /* CONTENT PAGE */
-    .content-page {
-      padding: 60px 70px;
-      page-break-before: always;
+    /* CONTENT PAGE BRAND BAR */
+    .brand-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-bottom: 20px;
+      margin-bottom: 32px;
+      border-bottom: 2px solid #E2E8F0;
     }
+    .brand-bar img {
+      height: 28px;
+      width: auto;
+      object-fit: contain;
+    }
+    .brand-bar-product {
+      font-size: 11px;
+      color: #94A3B8;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      font-weight: 600;
+    }
+
+    /* SECTION HEADER */
     .section-header {
       display: flex;
       align-items: center;
@@ -296,6 +337,12 @@ export function buildReportHTML(user, scoringResult) {
     }
     .section-title { font-size: 20px; font-weight: 700; color: #0F172A; }
     .divider { border: none; border-top: 2px solid #E2E8F0; margin: 32px 0; }
+
+    /* CONTENT PAGE */
+    .content-page {
+      padding: 50px 70px;
+      page-break-before: always;
+    }
 
     /* EXECUTIVE SUMMARY BOX */
     .exec-box {
@@ -372,14 +419,14 @@ export function buildReportHTML(user, scoringResult) {
 <div class="page">
   <div class="cover">
     <div class="cover-logo">
-      <div class="cover-logo-icon">🛡</div>
-      <span class="cover-logo-text">SmartScore MSPI</span>
+      ${logoFull ? `<img src="${logoFull}" alt="AUTOMATA Risk Management">` : '<span style="color:#fff;font-weight:800;font-size:20px;letter-spacing:1px;">AUTOMATA</span><span style="color:#93C5FD;font-weight:400;font-size:14px;">&nbsp;Risk Management</span>'}
+      <div class="cover-logo-product">SmartScore MSPI</div>
     </div>
 
     <div class="cover-main">
       <div class="cover-badge">Informe Ejecutivo de Diagnóstico</div>
       <div class="cover-title">Diagnóstico de Madurez en<br>Seguridad de la Información</div>
-      <div class="cover-subtitle">Modelo de Seguridad y Privacidad de la Información – MinTIC Colombia</div>
+      <div class="cover-subtitle">Modelo de Seguridad y Privacidad de la Información &ndash; MinTIC Colombia</div>
       <div class="cover-score-box">
         <div>
           <span class="cover-score-num">${totalScore}</span>
@@ -402,7 +449,7 @@ export function buildReportHTML(user, scoringResult) {
       <div>
         <div class="cover-date">Fecha de evaluación</div>
         <div class="cover-entity-name" style="text-align:right;font-size:14px;">${today}</div>
-        <div class="confidential">Confidencial – Uso interno</div>
+        <div class="confidential">Confidencial &ndash; Uso interno</div>
       </div>
     </div>
   </div>
@@ -410,7 +457,10 @@ export function buildReportHTML(user, scoringResult) {
 
 <!-- ===== PÁGINA 2: RESUMEN EJECUTIVO + DOMINIOS ===== -->
 <div class="page content-page">
-
+  <div class="brand-bar">
+    ${logoIsotipo ? `<img src="${logoIsotipo}" alt="AUTOMATA">` : '<span style="font-size:13px;font-weight:800;color:#0F172A;">AUTOMATA</span>'}
+    <span class="brand-bar-product">SmartScore MSPI &mdash; Informe Ejecutivo</span>
+  </div>
   <!-- 1. Resumen Ejecutivo -->
   <div class="section-header">
     <div class="section-num">1</div>
@@ -475,7 +525,10 @@ export function buildReportHTML(user, scoringResult) {
 
 <!-- ===== PÁGINA 3: BRECHAS + PLAN DE ACCIÓN ===== -->
 <div class="page content-page">
-
+  <div class="brand-bar">
+    ${logoIsotipo ? `<img src="${logoIsotipo}" alt="AUTOMATA">` : '<span style="font-size:13px;font-weight:800;color:#0F172A;">AUTOMATA</span>'}
+    <span class="brand-bar-product">SmartScore MSPI &mdash; Análisis de Brechas</span>
+  </div>
   <!-- 4. Top 5 Brechas -->
   <div class="section-header">
     <div class="section-num">4</div>
@@ -508,9 +561,12 @@ export function buildReportHTML(user, scoringResult) {
   </table>
 </div>
 
-<!-- ===== PÁGINA 4: MENSAJE + CÓMO AYUDAMOS ===== -->
+<!-- ===== PÁGINA 4: CONCLUSIÓN + CÓMO AYUDAMOS ===== -->
 <div class="page content-page">
-
+  <div class="brand-bar">
+    ${logoIsotipo ? `<img src="${logoIsotipo}" alt="AUTOMATA">` : '<span style="font-size:13px;font-weight:800;color:#0F172A;">AUTOMATA</span>'}
+    <span class="brand-bar-product">SmartScore MSPI &mdash; Plan Estratégico</span>
+  </div>
   <!-- 6. Visión Estratégica -->
   <div class="section-header">
     <div class="section-num">6</div>
@@ -544,22 +600,22 @@ export function buildReportHTML(user, scoringResult) {
 
   <div class="help-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;">
     <div class="help-card" style="margin:0;">
-      <div class="help-card-icon">🗺</div>
+      <div class="help-card-icon" style="font-size:18px;font-weight:700;color:#0F4C81;">01</div>
       <div class="help-card-title">Implementación Estructurada MSPI</div>
       <div class="help-card-desc">Acompañamos a la entidad en el cierre de brechas detectadas en este informe, mediante un programa de trabajo alineado con los tiempos de MinTIC y el ITA (Índice de Transparencia y Acceso).</div>
     </div>
     <div class="help-card" style="margin:0;">
-      <div class="help-card-icon">⚖️</div>
+      <div class="help-card-icon" style="font-size:18px;font-weight:700;color:#0F4C81;">02</div>
       <div class="help-card-title">Gestión de Riesgos y Activos</div>
       <div class="help-card-desc">Desarrollamos el inventario de activos de información y el análisis de impacto (BIA), fundamentales para blindar la operación institucional frente a interrupciones y proteger la privacidad ciudadana.</div>
     </div>
     <div class="help-card" style="margin:0;">
-      <div class="help-card-icon">📝</div>
+      <div class="help-card-icon" style="font-size:18px;font-weight:700;color:#0F4C81;">03</div>
       <div class="help-card-title">Preparación para Auditorías</div>
       <div class="help-card-desc">Realizamos pre-auditorías de cumplimiento bajo estándar ISO 27001 para que la entidad responda con solvencia ante visitas de la Contraloría, Procuraduría o supervisión técnica de MinTIC.</div>
     </div>
     <div class="help-card" style="margin:0;">
-      <div class="help-card-icon">🎯</div>
+      <div class="help-card-icon" style="font-size:18px;font-weight:700;color:#0F4C81;">04</div>
       <div class="help-card-title">Monitoreo de Madurez Continuo</div>
       <div class="help-card-desc">Servicio de diagnóstico periódico para medir el avance real trimestre a trimestre, asegurando que la inversión en seguridad se traduzca en indicadores positivos de gestión pública.</div>
     </div>
@@ -578,8 +634,8 @@ export function buildReportHTML(user, scoringResult) {
   </div>
 
   <div class="footer-note">
-    SmartScore MSPI | Informe generado el ${today} | Confidencial – Solo para uso interno de la entidad evaluada.<br>
-    Los resultados se basan en las respuestas proporcionadas por el evaluador y no constituyen una auditoría formal.
+    <strong>AUTOMATA Risk Management</strong> &mdash; SmartScore MSPI &mdash; Informe generado el ${today}<br>
+    Confidencial &ndash; Solo para uso interno de la entidad evaluada. Los resultados se basan en las respuestas proporcionadas por el evaluador y no constituyen una auditoría formal.
   </div>
 </div>
 
