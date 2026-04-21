@@ -37,6 +37,7 @@ const transporter = nodemailer.createTransport({
 async function generatePDF(user, scoringResult) {
   const html = buildReportHTML(user, scoringResult);
 
+  console.log('>>> LAUNCHING PUPPETEER...');
   const browser = await puppeteer.launch({
     headless: 'new',
     args: [
