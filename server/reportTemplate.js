@@ -542,21 +542,38 @@ export function buildReportHTML(user, scoringResult) {
     de servicios especializados en MSPI diseñados para el contexto del sector público colombiano.
   </p>
 
-  <div class="help-grid">
-    <div class="help-card">
+  <div class="help-grid" style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:20px;">
+    <div class="help-card" style="margin:0;">
       <div class="help-card-icon">🗺</div>
-      <div class="help-card-title">Programa de Implementación MSPI</div>
-      <div class="help-card-desc">Plan de trabajo mes a mes, con entregables definidos, para llevar a la entidad al nivel Gestionado u Optimizado en 6–18 meses.</div>
+      <div class="help-card-title">Implementación Estructurada MSPI</div>
+      <div class="help-card-desc">Acompañamos a la entidad en el cierre de brechas detectadas en este informe, mediante un programa de trabajo alineado con los tiempos de MinTIC y el ITA (Índice de Transparencia y Acceso).</div>
     </div>
-    <div class="help-card">
-      <div class="help-card-icon">📊</div>
-      <div class="help-card-title">Análisis de Riesgos de Activos</div>
-      <div class="help-card-desc">Identificación, valoración y tratamiento de los riesgos sobre los activos de información críticos de la entidad.</div>
+    <div class="help-card" style="margin:0;">
+      <div class="help-card-icon">⚖️</div>
+      <div class="help-card-title">Gestión de Riesgos y Activos</div>
+      <div class="help-card-desc">Desarrollamos el inventario de activos de información y el análisis de impacto (BIA), fundamentales para blindar la operación institucional frente a interrupciones y proteger la privacidad ciudadana.</div>
     </div>
-    <div class="help-card">
-      <div class="help-card-icon">🏅</div>
-      <div class="help-card-title">Certificado de Efectividad</div>
-      <div class="help-card-desc">Evaluación periódica y emisión de certificado de cumplimiento MSPI, como evidencia ante MinTIC y entes de control.</div>
+    <div class="help-card" style="margin:0;">
+      <div class="help-card-icon">📝</div>
+      <div class="help-card-title">Preparación para Auditorías</div>
+      <div class="help-card-desc">Realizamos pre-auditorías de cumplimiento bajo estándar ISO 27001 para que la entidad responda con solvencia ante visitas de la Contraloría, Procuraduría o supervisión técnica de MinTIC.</div>
+    </div>
+    <div class="help-card" style="margin:0;">
+      <div class="help-card-icon">🎯</div>
+      <div class="help-card-title">Monitoreo de Madurez Continuo</div>
+      <div class="help-card-desc">Servicio de diagnóstico periódico para medir el avance real trimestre a trimestre, asegurando que la inversión en seguridad se traduzca en indicadores positivos de gestión pública.</div>
+    </div>
+  </div>
+
+  <div style="margin-top:35px;background:#F1F5F9;border-radius:12px;padding:24px;text-align:center;">
+    <div style="font-size:14px;color:#1E293B;font-weight:700;margin-bottom:8px;">¿Desea profundizar en este diagnóstico?</div>
+    <div style="font-size:13px;color:#475569;line-height:1.6;max-width:550px;margin:0 auto 18px auto;">
+      La seguridad de la información es un proceso de evolución constante. Estamos listos para apoyarle en la interpretación detallada de estos resultados y en la formulación de su plan institucional 2026.
+    </div>
+    <div style="display:flex;justify-content:center;gap:15px;">
+      <div style="font-size:13px;font-weight:700;color:#0F4C81;">Solicitar Sesión Consultiva</div>
+      <div style="font-size:13px;font-weight:700;color:#0F4C81;">•</div>
+      <div style="font-size:13px;font-weight:700;color:#0F4C81;">lejabamo@gmail.com</div>
     </div>
   </div>
 
