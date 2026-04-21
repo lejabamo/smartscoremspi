@@ -11,30 +11,30 @@ function getMaturityColor(level) {
   return colors[level] || colors['Inicial'];
 }
 
-function getMaturityDescription(level) {
-  const desc = {
-    'Inicial':
-      'La entidad no cuenta con procesos documentados ni controles formales de seguridad de la información. La gestión depende de iniciativas individuales y no de una política institucional. Existe un riesgo significativo de incumplimiento normativo ante MinTIC.',
-    'Básico':
-      'Existen algunos controles y documentos de seguridad, pero no están implementados de manera consistente. La entidad ha dado pasos iniciales, pero aún hay brechas importantes que representan riesgo operativo, legal y reputacional.',
-    'Gestionado':
-      'La entidad cuenta con procesos definidos, documentados y aplicados de forma consistente. La seguridad de la información está integrada en la gestión institucional, aunque hay oportunidades de mejora hacia la optimización continua.',
-    'Optimizado':
-      'La entidad lidera en la gestión de seguridad de la información. Los procesos son continuamente revisados y mejorados. Representa un referente de buenas prácticas en el sector público colombiano.',
-  };
-  return desc[level] || desc['Inicial'];
-}
+function getStrategicSummary(level, score, domainScores) {
+  const lowDomain = [...(domainScores || [])].sort((a, b) => a.percentage - b.percentage)[0];
+  const lowDomainLabel = lowDomain ? getDomainLabel(lowDomain.domain) : 'Gestión de Riesgos';
 
-function getStrategicMessage(level, score) {
-  if (score < 25) {
-    return `Con un puntaje de ${score}/100, la entidad se encuentra en una etapa crítica que requiere acción inmediata. El riesgo de sanciones por parte de MinTIC, vulnerabilidades en datos ciudadanos y exposición ante incidentes cibernéticos es alto. La buena noticia: un plan de implementación estructurado puede mejorar significativamente este indicador en 6 a 12 meses.`;
-  } else if (score < 50) {
-    return `Con un puntaje de ${score}/100, la entidad tiene fundamentos pero les falta cohesión. Hay controles que funcionan, pero de forma aislada. El siguiente paso es articular estos esfuerzos en una política integral que le permita cumplir con los estándares de MinTIC y reducir la exposición a riesgos.`;
-  } else if (score < 75) {
-    return `Con un puntaje de ${score}/100, la entidad está en buen camino. Ha construido una base sólida de seguridad de la información. Los esfuerzos ahora deben orientarse a la optimización, la medición continua y la preparación para una posible certificación ISO/IEC 27001.`;
-  } else {
-    return `Con un puntaje de ${score}/100, la entidad demuestra un nivel de madurez destacado en seguridad de la información. Es un referente en el sector público. El reto ahora es mantener esta posición, documentar lecciones aprendidas y apoyar a otras entidades del territorio.`;
-  }
+  const summaries = {
+    'Inicial': `
+      <p style="margin-bottom: 15px;">La entidad presenta un nivel de madurez <strong>Inicial (${score}/100)</strong>, lo que indica una gestión de seguridad reactiva y carente de controles formales. Actualmente, la protección de los datos ciudadanos y la continuidad de los servicios digitales dependen de esfuerzos aislados, sin un marco de gobernanza que los sustente. Esto sitúa a la entidad en una zona de <strong>Riesgo Crítico</strong> ante incidentes cibernéticos y posibles sanciones por incumplimiento del Decreto 1078 de 2015.</p>
+      <p>La carencia de una hoja de ruta estructurada afecta especialmente la dimensión de <strong>${lowDomainLabel}</strong>, comprometiendo la integridad de la información institucional. Es imperativo transitar de un modelo de "atención de incendios" a uno de prevención estratégica para evitar fugas de información o parálisis operativa que impacten la confianza ciudadana y la legalidad del proceso administrativo.</p>
+    `,
+    'Básico': `
+      <p style="margin-bottom: 15px;">Con un puntaje de <strong>${score}/100 (Nivel Básico)</strong>, la entidad ha dado pasos importantes en la documentación de procesos, pero aún carece de una ejecución sistemática. La seguridad se percibe como una tarea técnica y no como un Pilar de Gestión. El riesgo institucional es <strong>Moderado-Alto</strong>, principalmente por la brecha entre lo que dice la norma y lo que realmente se aplica en la operación diaria, dejando puertas abiertas a vulnerabilidades que el MSPI exige cerrar.</p>
+      <p>Fortalecer la dimensión de <strong>${lowDomainLabel}</strong> es la prioridad inmediata para blindar la operación. El objetivo estratégico para el próximo trimestre debe ser la formalización de evidencias y la capacitación del personal, transformando los documentos actuales en controles vivos que protejan el activo más valioso de la entidad: la información pública.</p>
+    `,
+    'Gestionado': `
+      <p style="margin-bottom: 15px;">La entidad alcanza un nivel <strong>Gestionado (${score}/100)</strong>, demostrando que la seguridad de la información está integrada en la estrategia institucional. Los procesos están maduros y existe un control efectivo sobre los activos críticos. El riesgo de cumplimiento es bajo, lo que genera un entorno de confianza para la transformación digital y un respaldo sólido ante auditorías de MinTIC o entes de control.</p>
+      <p>El reto actual no es la implementación, sino la <strong>Sostenibilidad</strong>. Es momento de enfocar esfuerzos en la mejora continua y en elevar los estándares de la dimensión <strong>${lowDomainLabel}</strong>. Mantener este nivel requiere una inversión constante en cultura organizacional, asegurando que la seguridad no sea un hito alcanzado, sino un proceso de evolución permanente que posicione a la entidad como referente regional.</p>
+    `,
+    'Optimizado': `
+      <p style="margin-bottom: 15px;">Felicitaciones: La entidad ostenta un nivel <strong>Optimizado (${score}/100)</strong>, situándose a la vanguardia nacional en gestión MSPI. La seguridad es proactiva, auditable y está orientada a la excelencia. Este estado no solo garantiza el cumplimiento pleno de la normativa MinTIC, sino que convierte a la identidad en un baluarte de confianza y transparencia para la ciudadanía y el ecosistema digital colombiano.</p>
+      <p>Desde una perspectiva estratégica, la prioridad es documentar este caso de éxito y liderar procesos de benchmarking regional. El enfoque preventivo es total y los riesgos son gestionados en tiempo real. La entidad está lista para certificaciones internacionales de alto impacto, manteniendo siempre la vigilancia sobre <strong>${lowDomainLabel}</strong> para no permitir retrocesos ante las nuevas amenazas emergentes.</p>
+    `
+  };
+
+  return summaries[level] || summaries['Inicial'];
 }
 
 function getDomainLabel(domain) {
@@ -403,13 +403,15 @@ export function buildReportHTML(user, scoringResult) {
 
   <hr class="divider">
 
-  <!-- 2. Nivel de Madurez Explicado -->
+  <!-- 2. Resumen Ejecutivo Estratégico -->
   <div class="section-header" style="margin-top:0;">
     <div class="section-num">2</div>
-    <div class="section-title">¿Qué significa estar en nivel "${maturityLevel}"?</div>
+    <div class="section-title">Análisis de Riesgo y Madurez</div>
   </div>
   <div class="exec-box" style="border-color:${matColor.badge}44;background:${matColor.bg};">
-    <p style="color:${matColor.text};">${getMaturityDescription(maturityLevel)}</p>
+    <div style="color:${matColor.text};font-size:14px;line-height:1.8;">
+      ${getStrategicSummary(maturityLevel, totalScore, domainScores)}
+    </div>
   </div>
 
   <hr class="divider">
@@ -468,14 +470,16 @@ export function buildReportHTML(user, scoringResult) {
 <!-- ===== PÁGINA 4: MENSAJE + CÓMO AYUDAMOS ===== -->
 <div class="page content-page">
 
-  <!-- 6. Mensaje Estratégico -->
+  <!-- 6. Visión Estratégica -->
   <div class="section-header">
     <div class="section-num">6</div>
-    <div class="section-title">Orientación Estratégica</div>
+    <div class="section-title">Conclusión de Gestión</div>
   </div>
   <div class="strategic-box">
-    <h3>📌 Lectura del Resultado</h3>
-    <p>${getStrategicMessage(maturityLevel, totalScore)}</p>
+    <p style="font-size:14px;line-height:1.8;color:#CBD5E1;">
+      La seguridad de la información institucional no es un hito tecnológico, sino una capacidad de gestión continua. 
+      La madurez alcanzada en esta evaluación es el cimiento para construir una entidad resiliente ante las amenazas del entorno digital actual.
+    </p>
   </div>
 
   <p style="font-size:13px;color:#475569;line-height:1.8;margin-bottom:28px;">
