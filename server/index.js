@@ -1,4 +1,5 @@
 import express from 'express';
+console.log('>>> INICIANDO EXPRESS...');
 import cors from 'cors';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';

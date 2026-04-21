@@ -5,7 +5,16 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const dbPath = join(__dirname, '../../database.sqlite');
 
-const db = new Database(dbPath);
+console.log('>>> DB PATH:', dbPath);
+
+let db;
+try {
+  db = new Database(dbPath);
+  console.log('>>> DB CONNECTED SUCCESS!');
+} catch (err) {
+  console.error('>>> DB CONNECTION ERROR:', err);
+  throw err;
+}
 
 // Initialize tables
 db.exec(`
