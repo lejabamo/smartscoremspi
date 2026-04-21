@@ -47,17 +47,42 @@ function getDomainLabel(domain) {
   return labels[domain] || domain;
 }
 
-function getActionForGap(question) {
-  const priority = question.weight >= 1.0 ? 'Alta' : question.weight >= 0.8 ? 'Media' : 'Baja';
-  const priorityColor = priority === 'Alta' ? '#EF4444' : priority === 'Media' ? '#F59E0B' : '#10B981';
-  const actions = {
-    'Governance':           'Formular y aprobar mediante acto administrativo',
-    'Risk Management':      'Identificar activos, amenazas y controles compensatorios',
-    'Operational Controls': 'Implementar procedimiento y capacitar al personal responsable',
-    'Compliance & Evidence':'Generar acta/documento de evidencia y registrar en el sistema de gestión',
+function getDetailedGapAnalysis(q) {
+  const domain = q.domain || 'General';
+  
+  const analysisMap = {
+    'Governance': {
+       problem: 'Ausencia de Marco de Gobernanza MSPI',
+       impact: 'Falta de dirección estratégica y responsabilidad legal. Sin políticas aprobadas, cualquier control técnico carece de validez jurídica ante MinTIC.',
+       action: 'Aprobar formalmente la Política General de Seguridad de la Información mediante Acto Administrativo y conformar el Comité de Seguridad.'
+    },
+    'Risk Management': {
+       problem: 'Falta de Gestión de Riesgos Institucional',
+       impact: 'La entidad está "ciega" ante sus amenazas. No se pueden priorizar inversiones ni proteger activos críticos de forma costo-efectiva.',
+       action: 'Realizar una metodología de gestión de riesgos (basada en MAGERIT o ISO 31000) e identificar los activos de información del proceso misional.'
+    },
+    'Operational Controls': {
+       problem: 'Debilidad en la Operación y Controles Técnicos',
+       impact: 'Vulnerabilidad directa ante ataques externos, robo de identidad o pérdida accidental de datos ciudadanos por falta de procedimientos.',
+       action: 'Implementar controles de acceso, gestión de copias de seguridad y procedimientos de respuesta ante incidentes cibernéticos.'
+    },
+    'Compliance & Evidence': {
+       problem: 'Incumplimiento de Evidencia y Monitoreo',
+       impact: 'Imposibilidad de demostrar cumplimiento ante la Procuraduría o MinTIC. Lo que no está documentado y registrado no existe para el auditor.',
+       action: 'Establecer un programa de cumplimiento periódico y generar registros (actas, logs, auditorías internas) como evidencia de efectividad.'
+    }
   };
-  const action = actions[question.domain] || 'Documentar y formalizar el control';
-  return { priority, priorityColor, action };
+
+  const analysis = analysisMap[domain] || {
+    problem: `Deficiencia en ${getDomainLabel(domain)}`,
+    impact: 'Riesgo de incumplimiento normativo y debilitamiento del ecosistema de confianza digital de la entidad.',
+    action: 'Documentar el procedimiento, asignar responsables y generar evidencia de su ejecución.'
+  };
+
+  const priority = q.weight >= 1.0 ? 'Alta' : q.weight >= 0.8 ? 'Media' : 'Baja';
+  const priorityColor = priority === 'Alta' ? '#EF4444' : priority === 'Media' ? '#F59E0B' : '#10B981';
+
+  return { ...analysis, priority, priorityColor };
 }
 
 // --- Main Template ---
@@ -90,10 +115,10 @@ export function buildReportHTML(user, scoringResult) {
 
   // Action plan rows
   const actionRows = top5Gaps.map((q, i) => {
-    const { priority, priorityColor, action } = getActionForGap(q);
+    const { priority, priorityColor, problem, action } = getDetailedGapAnalysis(q);
     return `
       <tr style="background:${i % 2 === 0 ? '#F8FAFC' : '#FFFFFF'}">
-        <td style="padding:10px 12px;font-size:12px;color:#475569;vertical-align:top;">${getDomainLabel(q.domain)}</td>
+        <td style="padding:10px 12px;font-size:12px;color:#475569;vertical-align:top;">${problem}</td>
         <td style="padding:10px 12px;font-size:12px;color:#1E293B;vertical-align:top;">${action}</td>
         <td style="padding:10px 12px;text-align:center;vertical-align:top;">
           <span style="background:${priorityColor}22;color:${priorityColor};padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;">${priority}</span>
@@ -102,17 +127,26 @@ export function buildReportHTML(user, scoringResult) {
       </tr>`;
   }).join('');
 
-  // Gap cards
-  const gapCards = top5Gaps.map((q, i) => `
-    <div style="border-left:4px solid #EF4444;background:#FFF8F8;border-radius:0 8px 8px 0;padding:14px 18px;margin-bottom:12px;">
-      <div style="display:flex;gap:12px;align-items:flex-start;">
-        <span style="background:#EF4444;color:#fff;border-radius:50%;width:24px;height:24px;display:inline-flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;">${i + 1}</span>
-        <div>
-          <div style="font-size:13px;color:#1E293B;font-weight:600;margin-bottom:4px;">${getDomainLabel(q.domain)}</div>
-          <div style="font-size:12px;color:#475569;line-height:1.6;">${q.refMSPI || ''}</div>
+  // Gap cards (Auditor Insight)
+  const gapCards = top5Gaps.map((q, i) => {
+    const { problem, impact, priority } = getDetailedGapAnalysis(q);
+    return `
+    <div style="border-left:4px solid #EF4444;background:#FFF8F8;border-radius:0 8px 8px 0;padding:16px 20px;margin-bottom:12px;">
+      <div style="display:flex;gap:14px;align-items:flex-start;">
+        <span style="background:#EF4444;color:#fff;border-radius:50%;width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;flex-shrink:0;">${i + 1}</span>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+            <div style="font-size:14px;color:#0F172A;font-weight:700;">${problem}</div>
+            <div style="font-size:10px;color:#EF4444;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Prioridad ${priority}</div>
+          </div>
+          <div style="font-size:11px;color:#64748B;font-weight:600;margin-bottom:6px;text-transform:uppercase;">Impacto en la Entidad:</div>
+          <div style="font-size:12px;color:#475569;line-height:1.6;font-style:italic;">"${impact}"</div>
+          <div style="font-size:11px;color:#94A3B8;margin-top:8px;padding-top:8px;border-top:1px dashed #E2E8F0;">
+            Referencia: ${q.text}
+          </div>
         </div>
       </div>
-    </div>`).join('');
+    </div>`}).join('');
 
   return `<!DOCTYPE html>
 <html lang="es">
