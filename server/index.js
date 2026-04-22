@@ -37,7 +37,10 @@ const transporter = nodemailer.createTransport({
 async function generatePDF(user, scoringResult) {
   const html = buildReportHTML(user, scoringResult);
 
-  console.log('>>> LAUNCHING PUPPETEER...');
+  console.log('>>> INICIANDO GENERACIÓN DE PDF...');
+  
+  // En Azure, el navegador se descarga en esta ruta relativa gracias al .puppeteerrc.cjs
+  // Intentamos detectar la ruta automáticamente
   const browser = await puppeteer.launch({
     headless: 'new',
     args: [
